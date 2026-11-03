@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.env
+.drafts.json
+output/
+drafts.json

@@ -1,0 +1,15 @@
+{
+  "material_id": "M06",
+  "requested_slot": "20:00",
+  "suggested_slot": "20:00",
+  "status": "draft_saved",
+  "review_status": "draft_saved",
+  "risk_reasons": [],
+  "pending_confirmation": false,
+  "draft_saved": true,
+  "draft_id": "D-55682df65f2c",
+  "duplicate": true,
+  "published": false,
+  "reason": "草稿已保存",
+  "guard_corrections": []
+}

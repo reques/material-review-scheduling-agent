@@ -1,0 +1,63 @@
+[
+  {
+    "step": 1,
+    "action": "get_material",
+    "action_input": {
+      "material_id": "M04"
+    },
+    "tool_result_summary": "{\"id\": \"M04\", \"title\": \"新品预告短视频\", \"type\": \"video\", \"duration_seconds\": 20, \"format\": \"mp4\", \"copyright_license\": \"自有版权\", \"license\": \"自有版权\", \"owner\": \"内容组\", \"sensitive_flags\": [], \"disclaimer\": \"已包含免责声明\", \"missing_fields\": []}",
+    "decision_basis": "需要先读取素材元数据，确认是否存在与缺失字段。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 2,
+    "action": "check_rules",
+    "action_input": {
+      "material_id": "M04"
+    },
+    "tool_result_summary": "{\"material_id\": \"M04\", \"risks\": [], \"missing_fields\": []}",
+    "decision_basis": "读取与补查完成，执行规则检查以识别阻塞风险。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 3,
+    "action": "query_schedule",
+    "action_input": {
+      "slot": "17:00"
+    },
+    "tool_result_summary": "{\"slot\": \"17:00\", \"occupied\": false, \"occupant_material_id\": null, \"nearby_free_slots\": [\"19:00\", \"20:00\", \"21:00\"]}",
+    "decision_basis": "规则无阻塞风险，查询请求时段是否被占用。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 4,
+    "action": "save_draft",
+    "action_input": {
+      "material_id": "M04",
+      "requested_slot": "17:00",
+      "suggested_slot": "17:00",
+      "pending_confirmation": false
+    },
+    "tool_result_summary": "{\"draft_id\": \"D-77c0c72d6dab\", \"draft_saved\": true, \"duplicate\": false, \"material_id\": \"M04\", \"requested_slot\": \"17:00\", \"suggested_slot\": \"17:00\", \"pending_confirmation\": false, \"status\": \"draft\"}",
+    "decision_basis": "请求时段空闲，保存草稿（仅草稿，不发布）。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 5,
+    "action": "finish",
+    "action_input": {
+      "status": "draft_saved",
+      "review_status": "draft_saved",
+      "risk_reasons": [],
+      "suggested_slot": "17:00",
+      "pending_confirmation": false,
+      "draft_saved": true,
+      "draft_id": "D-77c0c72d6dab",
+      "duplicate": false,
+      "reason": "草稿已保存"
+    },
+    "tool_result_summary": "",
+    "decision_basis": "草稿已保存，汇总审核状态、风险与待确认项后结束。",
+    "next": "done"
+  }
+]

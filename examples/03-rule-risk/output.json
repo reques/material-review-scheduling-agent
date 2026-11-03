@@ -1,0 +1,18 @@
+{
+  "material_id": "M03",
+  "requested_slot": "17:00",
+  "suggested_slot": null,
+  "status": "blocked",
+  "review_status": "blocked",
+  "risk_reasons": [
+    "素材为未授权转载，存在版权风险",
+    "素材带有敏感内容标记"
+  ],
+  "pending_confirmation": false,
+  "draft_saved": false,
+  "draft_id": null,
+  "duplicate": false,
+  "published": false,
+  "reason": "阻塞级规则风险：素材为未授权转载，存在版权风险; 素材带有敏感内容标记",
+  "guard_corrections": []
+}

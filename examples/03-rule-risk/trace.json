@@ -1,0 +1,42 @@
+[
+  {
+    "step": 1,
+    "action": "get_material",
+    "action_input": {
+      "material_id": "M03"
+    },
+    "tool_result_summary": "{\"id\": \"M03\", \"title\": \"转载合集视频\", \"type\": \"video\", \"duration_seconds\": 60, \"format\": \"mp4\", \"copyright_license\": \"未授权转载\", \"license\": \"未授权转载\", \"owner\": \"内容组\", \"sensitive_flags\": [\"敏感内容\"], \"disclaimer\": \"已包含免责声明\", \"missing_fields\": []}",
+    "decision_basis": "需要先读取素材元数据，确认是否存在与缺失字段。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 2,
+    "action": "check_rules",
+    "action_input": {
+      "material_id": "M03"
+    },
+    "tool_result_summary": "{\"material_id\": \"M03\", \"risks\": [{\"rule_id\": \"R02\", \"severity\": \"block\", \"reason\": \"素材为未授权转载，存在版权风险\"}, {\"rule_id\": \"R03\", \"severity\": \"block\", \"reason\": \"素材带有敏感内容标记\"}], \"missing_fields\": []}",
+    "decision_basis": "读取与补查完成，执行规则检查以识别阻塞风险。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 3,
+    "action": "finish",
+    "action_input": {
+      "status": "blocked",
+      "review_status": "blocked",
+      "risk_reasons": [
+        "素材为未授权转载，存在版权风险",
+        "素材带有敏感内容标记"
+      ],
+      "suggested_slot": null,
+      "pending_confirmation": false,
+      "draft_saved": false,
+      "draft_id": null,
+      "reason": "阻塞级规则风险：素材为未授权转载，存在版权风险; 素材带有敏感内容标记"
+    },
+    "tool_result_summary": "",
+    "decision_basis": "存在阻塞级规则风险，不得保存草稿，直接结束并报告阻塞。",
+    "next": "done"
+  }
+]
