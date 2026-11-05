@@ -1,0 +1,17 @@
+{
+  "material_id": "M06",
+  "requested_slot": "20:00",
+  "suggested_slot": "20:00",
+  "status": "draft_saved",
+  "review_status": "passed",
+  "risk_reasons": [],
+  "pending_confirmation": false,
+  "draft_saved": true,
+  "draft_id": "D-55682df65f2c",
+  "duplicate": true,
+  "published": false,
+  "reason": "素材自有版权、含免责声明、无敏感标签，规则检查零风险；20:00 时段未被占用，按用户硬性要求原时段保存草稿，未真实发布。",
+  "guard_corrections": [
+    "normalized model status: 使用保存工具观察统一为 draft_saved"
+  ]
+}

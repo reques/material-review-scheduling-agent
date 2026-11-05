@@ -1,0 +1,18 @@
+{
+  "material_id": "M02",
+  "requested_slot": "17:00",
+  "suggested_slot": null,
+  "status": "blocked",
+  "review_status": "blocked",
+  "risk_reasons": [
+    "缺少版权/授权信息",
+    "缺少素材标题，信息不完整"
+  ],
+  "pending_confirmation": false,
+  "draft_saved": false,
+  "draft_id": null,
+  "duplicate": false,
+  "published": false,
+  "reason": "素材存在阻断性合规与信息完整性风险，且补查未解决，无法保存发布草稿；请内容组补齐标题及版权/授权信息后重新提交审核。",
+  "guard_corrections": []
+}

@@ -1,0 +1,9 @@
+{
+  "checks": {
+    "first_draft_saved": true,
+    "old_draft_preserved": true,
+    "stale_draft_reported": true,
+    "real_responses_and_no_publish": true
+  },
+  "all_passed": true
+}

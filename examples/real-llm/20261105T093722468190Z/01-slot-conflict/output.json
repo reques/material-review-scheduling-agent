@@ -1,0 +1,17 @@
+{
+  "material_id": "M01",
+  "requested_slot": "18:00",
+  "suggested_slot": "19:00",
+  "status": "draft_saved",
+  "review_status": "passed",
+  "risk_reasons": [],
+  "pending_confirmation": true,
+  "draft_saved": true,
+  "draft_id": "D-4de8533c3e0f",
+  "duplicate": false,
+  "published": false,
+  "reason": "草稿已保存，建议时段需要用户确认。",
+  "guard_corrections": [
+    "normalized model status: 使用保存工具观察统一为 draft_saved"
+  ]
+}

@@ -1,0 +1,42 @@
+[
+  {
+    "step": 1,
+    "action": "get_material",
+    "action_input": {
+      "material_id": "M03"
+    },
+    "tool_result_summary": "{\"id\": \"M03\", \"title\": \"转载合集视频\", \"type\": \"video\", \"duration_seconds\": 60, \"format\": \"mp4\", \"copyright_license\": \"未授权转载\", \"license\": \"未授权转载\", \"owner\": \"内容组\", \"sensitive_flags\": [\"敏感内容\"], \"disclaimer\": \"已包含免责声明\", \"missing_fields\": []}",
+    "decision_basis": "先读取素材 M03 的元数据，确认基本信息和硬性要求。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 2,
+    "action": "check_rules",
+    "action_input": {
+      "material_id": "M03"
+    },
+    "tool_result_summary": "{\"material_id\": \"M03\", \"risks\": [{\"rule_id\": \"R02\", \"severity\": \"block\", \"reason\": \"素材为未授权转载，存在版权风险\"}, {\"rule_id\": \"R03\", \"severity\": \"block\", \"reason\": \"素材带有敏感内容标记\"}], \"missing_fields\": []}",
+    "decision_basis": "素材 M03 元数据显示为未授权转载且含敏感内容，需先执行规则检查以获取风险列表，再决定排期或仅保存待确认草稿。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 3,
+    "action": "finish",
+    "action_input": {
+      "status": "blocked",
+      "review_status": "rejected",
+      "risk_reasons": [
+        "R02: 素材为未授权转载，存在版权风险（block）",
+        "R03: 素材带有敏感内容标记（block）"
+      ],
+      "suggested_slot": null,
+      "pending_confirmation": false,
+      "draft_saved": false,
+      "draft_id": null,
+      "reason": "素材 M03 存在两项硬性阻断风险（未授权转载、敏感内容），不满足发布条件，故未保存草稿、未占用 17:00 时段。建议先补充版权授权与敏感内容复核，通过后再重新提交排期；原硬性时段要求 17:00 未被变更。"
+    },
+    "tool_result_summary": "",
+    "decision_basis": "规则检查返回两条 block 级风险（R02 未授权转载版权风险、R03 敏感内容标记），素材不适合进入发布排期；因此不再查询时段，也不保存草稿，直接结束并标记为阻断待处理。",
+    "next": "done"
+  }
+]

@@ -35,6 +35,7 @@ def _load_dotenv() -> None:
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description="素材审核与发布排期 Agent（仅保存草稿，不真实发布）")
     p.add_argument("--material", help="素材 ID，如 M01")
+    p.add_argument("--list-pending", action="store_true", help="列出待处理素材及草稿状态；不调用模型")
     p.add_argument("--slot", help="请求发布时间，如 18:00")
     p.add_argument("--input", dest="input_path", help="JSON 输入文件，含 material_id / requested_slot / request_id")
     p.add_argument("--mock", action="store_true", help="使用离线 MockLLM（不需密钥，仅验证流程）")
@@ -52,6 +53,18 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list | None = None) -> int:
     args = build_parser().parse_args(argv)
+    if args.list_pending:
+        if args.material or args.slot or args.input_path:
+            print("错误：--list-pending 不能与 --material、--slot 或 --input 一起使用。", file=sys.stderr)
+            return 2
+        try:
+            draft_path = Path(args.draft_store) if args.draft_store else Path.cwd() / ".drafts.json"
+            tools = Tools(data_dir=args.data_dir, draft_store=DraftStore(draft_path))
+            print(json.dumps(tools.list_pending_materials(), ensure_ascii=False, indent=2))
+        except (OSError, ValueError, TypeError, KeyError) as exc:
+            print(f"错误：无法读取待处理素材或草稿：{exc}", file=sys.stderr)
+            return 2
+        return 0
     _load_dotenv()
 
     material_id = args.material
@@ -115,6 +128,10 @@ def main(argv: list | None = None) -> int:
     print(f"待确认：{result.get('pending_confirmation')}  草稿已保存：{result.get('draft_saved')}  草稿 ID：{result.get('draft_id')}")
     if result.get("duplicate"):
         print("重复提交：返回已有草稿，未新建记录。")
+    if result.get("existing_draft"):
+        existing = result["existing_draft"]
+        print(f"已有草稿：{existing.get('draft_id')}，时段：{existing.get('suggested_slot')}，"
+              f"待确认：{existing.get('pending_confirmation')}；请先人工处理。")
     print("已发布：False（本工具仅保存草稿，绝不真实发布）")
     if result.get("reason"):
         print(f"说明：{result['reason']}")

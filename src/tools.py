@@ -9,7 +9,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -85,11 +87,23 @@ class DraftStore:
 
     def _read_all(self) -> list:
         data = _load_json(self.path, [])
-        return data if isinstance(data, list) else []
+        if not isinstance(data, list):
+            raise ValueError("草稿存储格式错误：应为数组")
+        return data
 
     def _write_all(self, records: list) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        self.path.write_text(json.dumps(records, ensure_ascii=False, indent=2), encoding="utf-8")
+        content = json.dumps(records, ensure_ascii=False, indent=2)
+        temporary = None
+        try:
+            with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=self.path.parent,
+                                             delete=False) as output:
+                temporary = output.name
+                output.write(content)
+            os.replace(temporary, self.path)
+        finally:
+            if temporary and os.path.exists(temporary):
+                os.unlink(temporary)
 
     def count(self) -> int:
         return len(self._read_all())
@@ -138,7 +152,7 @@ class Tools:
         self.materials: dict[str, Material] = {}
         for item in items:
             mat = Material(
-                id=item.get("id", ""), title=item.get("title", ""),
+                id=item.get("id", ""), work_status=item.get("work_status", "unspecified"), title=item.get("title", ""),
                 type=item.get("type", ""), duration_seconds=item.get("duration_seconds", 0),
                 format=item.get("format", ""), license=item.get("license", ""),
                 owner=item.get("owner", ""), sensitive_flags=item.get("sensitive_flags", []),
@@ -150,6 +164,16 @@ class Tools:
         raw_schedule = _load_json(self.data_dir / "schedule.json", {})
         self.schedule = raw_schedule.get("slots", {}) if isinstance(raw_schedule, dict) else {}
         self.draft_store = draft_store or DraftStore(Path.cwd() / ".drafts.json")
+        self.request = None
+        self.observations = []
+
+    def begin_request(self, request):
+        self.request = request
+        self.observations = []
+
+    def _own_draft(self, record):
+        return bool(self.request and record.get("material_id") == self.request.material_id
+                    and record.get("requested_slot") == self.request.requested_slot)
 
     # -- 校验 ---------------------------------------------------------
     def _validate(self, name: str, args: dict) -> str | None:
@@ -162,6 +186,8 @@ class Tools:
             if req not in args:
                 return f"invalid_params: 缺少必需参数 {req}"
         for key, value in args.items():
+            if key not in schema["parameters"]["properties"]:
+                return f"invalid_params: 未知参数 {key}"
             expected = schema["parameters"]["properties"].get(key, {}).get("type")
             if expected == "string" and not isinstance(value, str):
                 return f"invalid_params: 参数 {key} 应为字符串"
@@ -182,9 +208,44 @@ class Tools:
             "supplement_info": self.supplement_info,
             "save_draft": self.save_draft,
         }[name]
-        return handler(**args)
+        try:
+            result = handler(**args)
+        except (OSError, ValueError, json.JSONDecodeError) as exc:
+            error = "save_failed" if name == "save_draft" else "tool_failed"
+            result = {"error": error, "tool": name, "detail": str(exc)}
+        self.observations.append((name, args, result))
+        return result
 
     # -- 工具实现 ------------------------------------------------------
+    def list_pending_materials(self) -> dict:
+        """列出明确标记为 pending 的素材；未识别状态单独列出。"""
+        records = self.draft_store._read_all()
+        pending, unclassified = [], []
+        for material in self.materials.values():
+            if material.work_status not in ("pending", "completed", "archived"):
+                unclassified.append({"material_id": material.id, "work_status": material.work_status})
+                continue
+            if material.work_status != "pending":
+                continue
+            drafts = []
+            for rec in records:
+                if rec.get("material_id") != material.id:
+                    continue
+                slot = rec.get("suggested_slot")
+                entry = self.schedule.get(slot) or {}
+                conflict = bool(entry.get("occupied")) or any(
+                    other is not rec and other.get("suggested_slot") == slot for other in records)
+                drafts.append({"draft_id": rec.get("draft_id"), "suggested_slot": slot,
+                               "pending_confirmation": bool(rec.get("pending_confirmation")),
+                               "slot_conflict": conflict})
+            state = ("draft_conflict" if any(d["slot_conflict"] for d in drafts)
+                     else "pending_confirmation" if any(d["pending_confirmation"] for d in drafts)
+                     else "draft_saved" if drafts else "not_started")
+            pending.append({"material_id": material.id, "title": material.title,
+                            "work_status": material.work_status, "processing_state": state,
+                            "missing_fields": material.missing_fields(), "drafts": drafts})
+        return {"pending": pending, "unclassified": unclassified}
+
     def get_material(self, material_id: str) -> dict:
         mat = self.materials.get(material_id)
         if mat is None:
@@ -226,9 +287,18 @@ class Tools:
     def query_schedule(self, slot: str) -> dict:
         if not _SLOT_RE.match(slot):
             return {"error": "invalid_params: slot 应为 HH:MM 格式", "slot": slot}
-        entry = self.schedule.get(slot)
-        occupied = bool(entry and entry.get("occupied"))
-        occupant = entry.get("material_id") if entry else None
+        records = self.draft_store._read_all()
+        def occupant_for(candidate):
+            entry = self.schedule.get(candidate)
+            if entry and entry.get("occupied"):
+                return entry.get("material_id") or "已有排期"
+            for record in records:
+                if record.get("suggested_slot") == candidate and not self._own_draft(record):
+                    return record.get("material_id") or "已有草稿"
+            return None
+
+        occupant = occupant_for(slot)
+        occupied = occupant is not None
         # 附近空闲时段：从请求时段之后逐小时扫描，最多 3 个（供模型从观察数据中选择）。
         hour, minute = int(slot[:2]), int(slot[3:])
         free_slots = []
@@ -237,8 +307,7 @@ class Tools:
             if h > 23:
                 break
             candidate = f"{h:02d}:{minute:02d}"
-            cand_entry = self.schedule.get(candidate)
-            if not (cand_entry and cand_entry.get("occupied")):
+            if occupant_for(candidate) is None:
                 free_slots.append(candidate)
             if len(free_slots) >= 3:
                 break
@@ -264,6 +333,31 @@ class Tools:
 
     def save_draft(self, material_id: str, requested_slot: str, suggested_slot: str,
                    pending_confirmation: bool = False) -> dict:
-        # 注意：本工具只保存草稿，绝不执行真实发布；发布动作不存在于工具集中。
+        # 检查写入前提，不能依赖模型的自述或事后的结果护栏。
+        if not self.request or (material_id, requested_slot) != (self.request.material_id, self.request.requested_slot):
+            return {"error": "guard_rejected", "detail": "素材或请求时段与当前请求不一致"}
+        if not _SLOT_RE.fullmatch(requested_slot) or not _SLOT_RE.fullmatch(suggested_slot):
+            return {"error": "guard_rejected", "detail": "时段格式无效"}
+        if suggested_slot != requested_slot and not pending_confirmation:
+            return {"error": "guard_rejected", "detail": "改变请求时段必须标记待确认"}
+        material_read = any(name == "get_material" and args.get("material_id") == material_id
+                            and not result.get("error") for name, args, result in self.observations)
+        rules_checked = any(name == "check_rules" and args.get("material_id") == material_id
+                            and not result.get("error") for name, args, result in self.observations)
+        if not material_read or not rules_checked:
+            return {"error": "guard_rejected", "detail": "保存前须读取素材并检查规则"}
+        risks = self.check_rules(material_id)
+        if risks.get("error") or any(r.get("severity") == "block" for r in risks.get("risks", [])):
+            return {"error": "guard_rejected", "detail": "素材不存在或存在阻塞级规则风险"}
+        records = self.draft_store._read_all()
+        existing = next((r for r in records if self._own_draft(r)), None)
+        if existing and existing.get("suggested_slot") != suggested_slot:
+            return {"error": "existing_draft_conflict", "detail": "已有草稿的时段与当前建议不同，需人工处理",
+                    "existing_draft": {k: existing.get(k) for k in ("draft_id", "suggested_slot", "pending_confirmation")}}
+        observed_free = any(name == "query_schedule" and args.get("slot") == suggested_slot
+                            and result.get("occupied") is False and not result.get("error")
+                            for name, args, result in self.observations)
+        if not observed_free or self.query_schedule(suggested_slot).get("occupied"):
+            return {"error": "guard_rejected", "detail": "建议时段未验证为空闲或已被占用"}
         return self.draft_store.save(material_id, requested_slot, suggested_slot,
                                      bool(pending_confirmation))

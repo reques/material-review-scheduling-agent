@@ -4,6 +4,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from src.agent import run
 from src.guards import assemble_result, assert_hard_requirement_not_silently_changed, assert_no_publish_claim
@@ -180,6 +181,108 @@ class TestToolValidation(unittest.TestCase):
         self.assertEqual(obj["action"], "finish")
         with self.assertRaises(LLMError):
             extract_json_object("没有 JSON")
+
+
+class TestSafetyAndState(unittest.TestCase):
+    def test_different_materials_do_not_share_a_draft_slot(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tools, store = make_tools(tmp)
+            first, _ = run(AgentRequest("M04", "17:00"), MockLLM(), tools)
+            second, _ = run(AgentRequest("M06", "17:00"), MockLLM(), tools)
+            self.assertEqual(first["suggested_slot"], "17:00")
+            self.assertEqual(second["status"], "draft_saved")
+            self.assertNotEqual(second["suggested_slot"], "17:00")
+            self.assertTrue(second["pending_confirmation"])
+            self.assertEqual(len({r["suggested_slot"] for r in store._read_all()}), 2)
+
+    def test_conflicting_existing_draft_is_reported_without_overwrite(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tools, store = make_tools(tmp)
+            request = AgentRequest("M01", "18:00")
+            first, _ = run(request, MockLLM(), tools)
+            tools.schedule["19:00"] = {"occupied": True, "material_id": "OTHER"}
+            second, _ = run(request, MockLLM(), tools)
+            self.assertEqual(second["status"], "blocked")
+            self.assertFalse(second["draft_saved"])
+            self.assertEqual(second["existing_draft"]["draft_id"], first["draft_id"])
+            self.assertEqual(second["existing_draft"]["suggested_slot"], "19:00")
+            self.assertEqual(store.count(), 1)
+            self.assertEqual(store._read_all()[0]["suggested_slot"], "19:00")
+
+    def test_write_guard_blocks_risky_and_unconfirmed_saves(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tools, store = make_tools(tmp)
+            tools.begin_request(AgentRequest("M03", "18:00"))
+            tools.dispatch("get_material", {"material_id": "M03"})
+            tools.dispatch("check_rules", {"material_id": "M03"})
+            tools.dispatch("query_schedule", {"slot": "19:00"})
+            bad = tools.dispatch("save_draft", {"material_id": "M03", "requested_slot": "18:00",
+                                              "suggested_slot": "19:00", "pending_confirmation": True})
+            self.assertEqual(bad["error"], "guard_rejected")
+            tools.begin_request(AgentRequest("M01", "18:00"))
+            tools.dispatch("get_material", {"material_id": "M01"})
+            tools.dispatch("check_rules", {"material_id": "M01"})
+            tools.dispatch("query_schedule", {"slot": "19:00"})
+            bad = tools.dispatch("save_draft", {"material_id": "M01", "requested_slot": "18:00",
+                                              "suggested_slot": "19:00", "pending_confirmation": False})
+            self.assertEqual(bad["error"], "guard_rejected")
+            self.assertEqual(store.count(), 0)
+
+    def test_write_guard_requires_matching_request_and_observed_free_slot(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tools, store = make_tools(tmp)
+            tools.begin_request(AgentRequest("M04", "17:00"))
+            tools.dispatch("get_material", {"material_id": "M04"})
+            tools.dispatch("check_rules", {"material_id": "M04"})
+            for material, slot in [("M06", "17:00"), ("M04", "17:00")]:
+                result = tools.dispatch("save_draft", {"material_id": material, "requested_slot": "17:00",
+                                                       "suggested_slot": slot, "pending_confirmation": False})
+                self.assertEqual(result["error"], "guard_rejected")
+            self.assertEqual(store.count(), 0)
+
+    def test_step_cap_preserves_real_save_result(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tools, store = make_tools(tmp)
+            result, _ = run(AgentRequest("M04", "17:00"), MockLLM(), tools, max_steps=4)
+            self.assertEqual(result["status"], "incomplete")
+            self.assertTrue(result["draft_saved"])
+            self.assertEqual(result["draft_id"], store._read_all()[0]["draft_id"])
+            self.assertIn("草稿已保存", result["reason"])
+
+    def test_save_rechecks_slot_after_observation(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tools, store = make_tools(tmp)
+            tools.begin_request(AgentRequest("M04", "17:00"))
+            tools.dispatch("get_material", {"material_id": "M04"})
+            tools.dispatch("check_rules", {"material_id": "M04"})
+            self.assertFalse(tools.dispatch("query_schedule", {"slot": "17:00"})["occupied"])
+            tools.schedule["17:00"] = {"occupied": True, "material_id": "OTHER"}
+            result = tools.dispatch("save_draft", {"material_id": "M04", "requested_slot": "17:00",
+                                                   "suggested_slot": "17:00", "pending_confirmation": False})
+            self.assertEqual(result["error"], "guard_rejected")
+            self.assertEqual(store.count(), 0)
+
+    def test_real_write_exception_returns_save_failed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tools, store = make_tools(tmp)
+            with patch.object(store, "_write_all", side_effect=PermissionError("denied")):
+                result, _ = run(AgentRequest("M04", "17:00"), MockLLM(), tools)
+            self.assertEqual(result["status"], "save_failed")
+            self.assertFalse(result["draft_saved"])
+            self.assertEqual(store.count(), 0)
+
+    def test_publish_claim_in_reason_is_removed(self):
+        result = assemble_result({"status": "blocked", "reason": "内容已发布"}, [], "17:00", "M04")
+        self.assertNotIn("已发布", result["reason"])
+        self.assertFalse(result["published"])
+        self.assertTrue(result["guard_corrections"])
+
+    def test_no_save_observation_cannot_claim_saved_in_blocked_result(self):
+        result = assemble_result({"status": "blocked", "draft_saved": True, "draft_id": "fake",
+                                  "reason": "草稿已保存"}, [], "17:00", "M04")
+        self.assertFalse(result["draft_saved"])
+        self.assertIsNone(result["draft_id"])
+        self.assertNotIn("草稿已保存", result["reason"])
 
 
 if __name__ == "__main__":

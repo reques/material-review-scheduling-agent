@@ -54,12 +54,15 @@ class OpenAICompatibleClient(LLMClient):
         self.api_key = api_key or os.environ.get("LLM_API_KEY", "")
         self.model = model or os.environ.get("LLM_MODEL", "deepseek-chat")
         self.timeout = timeout
+        self.call_attempts = 0
+        self.response_models: list[str] = []
         if not self.base_url:
             raise LLMError("LLM_BASE_URL 未配置，见 .env.example；或使用 --mock 离线模式")
         if not self.api_key:
             raise LLMError("LLM_API_KEY 未配置，见 .env.example；或使用 --mock 离线模式")
 
     def decide(self, prompt: str) -> dict:
+        self.call_attempts += 1
         body = json.dumps({
             "model": self.model,
             "messages": [
@@ -92,6 +95,7 @@ class OpenAICompatibleClient(LLMClient):
         obj = extract_json_object(content)
         if "action" not in obj:
             raise LLMError("LLM JSON missing 'action'")
+        self.response_models.append(str(payload.get("model") or "未返回模型名称"))
         return obj
 
 
@@ -205,6 +209,12 @@ class MockLLM(LLMClient):
         if requested_obs is None:
             return {"thought": "规则无阻塞风险，查询请求时段是否被占用。",
                     "action": "query_schedule", "action_input": {"slot": requested_slot}}
+
+        if requested_obs.get("error"):
+            return {"thought": "排期查询失败，无法安全保存草稿。", "action": "finish",
+                    "action_input": {"status": "blocked", "review_status": "blocked",
+                                     "risk_reasons": ["排期查询失败"], "draft_saved": False,
+                                     "reason": "排期查询失败：" + str(requested_obs["error"])}}
 
         # 5. 时段被占：从观察到的空闲时段中选一个并先验证它确实空闲。
         #    只要已验证过一个空闲替代时段，就保存草稿，不再逐个验证其余时段。

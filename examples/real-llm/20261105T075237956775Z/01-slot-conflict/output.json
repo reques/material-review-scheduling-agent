@@ -1,0 +1,15 @@
+{
+  "material_id": "M01",
+  "requested_slot": "18:00",
+  "suggested_slot": "19:00",
+  "status": "draft",
+  "review_status": "passed",
+  "risk_reasons": [],
+  "pending_confirmation": true,
+  "draft_saved": true,
+  "draft_id": "D-4de8533c3e0f",
+  "duplicate": false,
+  "published": false,
+  "reason": "处理未正常结束，但草稿实际已保存，请核查草稿及后续处理。",
+  "guard_corrections": []
+}

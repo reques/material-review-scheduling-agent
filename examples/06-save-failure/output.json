@@ -10,6 +10,6 @@
   "draft_id": null,
   "duplicate": false,
   "published": false,
-  "reason": "保存草稿失败：save_failed",
+  "reason": "保存草稿失败，请检查存储后重试。",
   "guard_corrections": []
 }

@@ -1,0 +1,12 @@
+[
+  {
+    "draft_id": "D-4de8533c3e0f",
+    "material_id": "M01",
+    "requested_slot": "18:00",
+    "suggested_slot": "19:00",
+    "status": "draft",
+    "pending_confirmation": true,
+    "idempotency_key": "4de8533c3e0ff11e540b31b6822c95136e39b36d449ea304c835f44cbba2a667",
+    "created_at": "2026-11-05T09:17:46.137471+00:00"
+  }
+]

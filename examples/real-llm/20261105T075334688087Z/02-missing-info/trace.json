@@ -1,0 +1,53 @@
+[
+  {
+    "step": 1,
+    "action": "get_material",
+    "action_input": {
+      "material_id": "M02"
+    },
+    "tool_result_summary": "{\"id\": \"M02\", \"title\": \"\", \"type\": \"video\", \"duration_seconds\": 30, \"format\": \"mp4\", \"copyright_license\": \"\", \"license\": \"\", \"owner\": \"内容组\", \"sensitive_flags\": [], \"disclaimer\": \"已包含免责声明\", \"missing_fields\": [\"title\", \"license\"]}",
+    "decision_basis": "需先读取素材 M02 的元数据，确认类型与发布时间要求，再执行规则检查。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 2,
+    "action": "supplement_info",
+    "action_input": {
+      "material_id": "M02"
+    },
+    "tool_result_summary": "{\"material_id\": \"M02\", \"supplemented_fields\": {}, \"still_missing\": [\"title\", \"license\"], \"resolved\": false}",
+    "decision_basis": "素材元数据缺少标题和授权信息，先补查缺失字段，再执行规则检查。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 3,
+    "action": "check_rules",
+    "action_input": {
+      "material_id": "M02"
+    },
+    "tool_result_summary": "{\"material_id\": \"M02\", \"risks\": [{\"rule_id\": \"R01\", \"severity\": \"block\", \"reason\": \"缺少版权/授权信息\"}, {\"rule_id\": \"R06\", \"severity\": \"block\", \"reason\": \"缺少素材标题，信息不完整\"}], \"missing_fields\": [\"title\", \"license\"]}",
+    "decision_basis": "素材标题和授权信息仍缺失，补查未解决；先按规则检查生成风险清单，再决定排期与草稿状态。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 4,
+    "action": "finish",
+    "action_input": {
+      "status": "blocked",
+      "review_status": "rejected",
+      "risk_reasons": [
+        "R01: 缺少版权/授权信息（block）",
+        "R06: 缺少素材标题，信息不完整（block）",
+        "补查后仍缺失字段：title、license"
+      ],
+      "suggested_slot": null,
+      "pending_confirmation": false,
+      "draft_saved": false,
+      "draft_id": null,
+      "reason": "素材 M02 未通过规则检查，存在 block 级风险且补查未能补齐缺失字段，无法保存草稿或安排发布；请内容组补充标题与版权/授权信息后重新提交审核。请求时段 17:00 未做任何变更或占用。"
+    },
+    "tool_result_summary": "",
+    "decision_basis": "素材存在两条 block 级风险（缺少版权/授权信息、缺少标题），补查后仍缺失，未解决；因此不能生成可发布草稿，需退回补充素材信息，且无需占用排期时段。",
+    "next": "done"
+  }
+]

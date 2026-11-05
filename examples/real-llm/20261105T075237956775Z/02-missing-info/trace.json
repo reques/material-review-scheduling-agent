@@ -1,0 +1,52 @@
+[
+  {
+    "step": 1,
+    "action": "get_material",
+    "action_input": {
+      "material_id": "M02"
+    },
+    "tool_result_summary": "{\"id\": \"M02\", \"title\": \"\", \"type\": \"video\", \"duration_seconds\": 30, \"format\": \"mp4\", \"copyright_license\": \"\", \"license\": \"\", \"owner\": \"内容组\", \"sensitive_flags\": [], \"disclaimer\": \"已包含免责声明\", \"missing_fields\": [\"title\", \"license\"]}",
+    "decision_basis": "先读取素材 M02 的元数据，确认基本信息后再进行规则检查与排期。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 2,
+    "action": "supplement_info",
+    "action_input": {
+      "material_id": "M02"
+    },
+    "tool_result_summary": "{\"material_id\": \"M02\", \"supplemented_fields\": {}, \"still_missing\": [\"title\", \"license\"], \"resolved\": false}",
+    "decision_basis": "素材元数据缺失 title 与 license，先补查缺失信息再决定审核结论。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 3,
+    "action": "check_rules",
+    "action_input": {
+      "material_id": "M02"
+    },
+    "tool_result_summary": "{\"material_id\": \"M02\", \"risks\": [{\"rule_id\": \"R01\", \"severity\": \"block\", \"reason\": \"缺少版权/授权信息\"}, {\"rule_id\": \"R06\", \"severity\": \"block\", \"reason\": \"缺少素材标题，信息不完整\"}], \"missing_fields\": [\"title\", \"license\"]}",
+    "decision_basis": "素材 M02 缺失 title 和 license，补查后仍未补齐；先执行规则检查，确认风险，再查询用户指定的 17:00 时段。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 4,
+    "action": "finish",
+    "action_input": {
+      "status": "blocked",
+      "review_status": "rejected",
+      "risk_reasons": [
+        "缺少版权/授权信息（R01，block）",
+        "缺少素材标题，信息不完整（R06，block）"
+      ],
+      "suggested_slot": null,
+      "pending_confirmation": false,
+      "draft_saved": false,
+      "draft_id": null,
+      "reason": "素材存在阻断性合规与信息完整性风险，且补查未解决，无法保存发布草稿；请内容组补齐标题及版权/授权信息后重新提交审核。"
+    },
+    "tool_result_summary": "",
+    "decision_basis": "素材缺少标题与版权/授权信息，补查后仍未补齐；规则检查命中两项 block 级风险，不能进入排期或保存草稿。",
+    "next": "done"
+  }
+]

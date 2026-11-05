@@ -1,0 +1,62 @@
+[
+  {
+    "step": 1,
+    "action": "get_material",
+    "action_input": {
+      "material_id": "M06"
+    },
+    "tool_result_summary": "{\"id\": \"M06\", \"title\": \"品牌故事短视频\", \"type\": \"video\", \"duration_seconds\": 40, \"format\": \"mp4\", \"copyright_license\": \"自有版权\", \"license\": \"自有版权\", \"owner\": \"内容组\", \"sensitive_flags\": [], \"disclaimer\": \"已包含免责声明\", \"missing_fields\": []}",
+    "decision_basis": "先读取素材 M06 的元数据，确认其基本信息和硬性要求。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 2,
+    "action": "check_rules",
+    "action_input": {
+      "material_id": "M06"
+    },
+    "tool_result_summary": "{\"material_id\": \"M06\", \"risks\": [], \"missing_fields\": []}",
+    "decision_basis": "素材元数据完整，无敏感标记；下一步按规则执行合规检查。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 3,
+    "action": "query_schedule",
+    "action_input": {
+      "slot": "20:00"
+    },
+    "tool_result_summary": "{\"slot\": \"20:00\", \"occupied\": false, \"occupant_material_id\": null, \"nearby_free_slots\": [\"21:00\", \"22:00\", \"23:00\"]}",
+    "decision_basis": "素材信息完整且规则检查无风险，下一步检查请求时段 20:00 是否被占用。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 4,
+    "action": "save_draft",
+    "action_input": {
+      "material_id": "M06",
+      "requested_slot": "20:00",
+      "suggested_slot": "20:00",
+      "pending_confirmation": false
+    },
+    "tool_result_summary": "{\"draft_id\": \"D-55682df65f2c\", \"draft_saved\": true, \"duplicate\": false, \"material_id\": \"M06\", \"requested_slot\": \"20:00\", \"suggested_slot\": \"20:00\", \"pending_confirmation\": false, \"status\": \"draft\"}",
+    "decision_basis": "素材元数据完整，规则检查无风险，20:00 时段空闲，可按用户要求的原始时段保存草稿。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 5,
+    "action": "finish",
+    "action_input": {
+      "status": "draft",
+      "review_status": "passed",
+      "risk_reasons": [],
+      "suggested_slot": "20:00",
+      "pending_confirmation": false,
+      "draft_saved": true,
+      "draft_id": "D-55682df65f2c",
+      "reason": "M06 品牌故事短视频（40 秒，自有版权，已含免责声明）通过规则检查，无敏感风险；20:00 时段未被占用，与用户请求时段一致。仅保存发布草稿，未真实发布。"
+    },
+    "tool_result_summary": "",
+    "decision_basis": "素材元数据完整，规则检查无风险，20:00 时段空闲且与用户要求一致，草稿已保存（未发布），无需变更时段或标记待确认。",
+    "next": "done"
+  }
+]

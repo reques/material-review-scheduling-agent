@@ -1,0 +1,17 @@
+{
+  "material_id": "M04",
+  "requested_slot": "17:00",
+  "suggested_slot": "17:00",
+  "status": "draft_saved",
+  "review_status": "passed",
+  "risk_reasons": [],
+  "pending_confirmation": false,
+  "draft_saved": true,
+  "draft_id": "D-77c0c72d6dab",
+  "duplicate": false,
+  "published": false,
+  "reason": "素材 M04 合规检查通过，无缺失字段；17:00 时段空闲，已按用户要求保存发布草稿，未真实发布。",
+  "guard_corrections": [
+    "normalized model status: 使用保存工具观察统一为 draft_saved"
+  ]
+}

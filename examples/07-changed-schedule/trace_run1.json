@@ -1,0 +1,73 @@
+[
+  {
+    "step": 1,
+    "action": "get_material",
+    "action_input": {
+      "material_id": "M01"
+    },
+    "tool_result_summary": "{\"id\": \"M01\", \"title\": \"产品介绍短视频\", \"type\": \"video\", \"duration_seconds\": 45, \"format\": \"mp4\", \"copyright_license\": \"自有版权\", \"license\": \"自有版权\", \"owner\": \"内容组\", \"sensitive_flags\": [], \"disclaimer\": \"已包含免责声明\", \"missing_fields\": []}",
+    "decision_basis": "需要先读取素材元数据，确认是否存在与缺失字段。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 2,
+    "action": "check_rules",
+    "action_input": {
+      "material_id": "M01"
+    },
+    "tool_result_summary": "{\"material_id\": \"M01\", \"risks\": [], \"missing_fields\": []}",
+    "decision_basis": "读取与补查完成，执行规则检查以识别阻塞风险。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 3,
+    "action": "query_schedule",
+    "action_input": {
+      "slot": "18:00"
+    },
+    "tool_result_summary": "{\"slot\": \"18:00\", \"occupied\": true, \"occupant_material_id\": \"M00\", \"nearby_free_slots\": [\"19:00\", \"20:00\", \"21:00\"]}",
+    "decision_basis": "规则无阻塞风险，查询请求时段是否被占用。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 4,
+    "action": "query_schedule",
+    "action_input": {
+      "slot": "19:00"
+    },
+    "tool_result_summary": "{\"slot\": \"19:00\", \"occupied\": false, \"occupant_material_id\": null, \"nearby_free_slots\": [\"20:00\", \"21:00\", \"22:00\"]}",
+    "decision_basis": "请求时段 18:00 被占用，观察到的空闲时段有 ['19:00', '20:00', '21:00']，先验证 19:00 是否空闲。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 5,
+    "action": "save_draft",
+    "action_input": {
+      "material_id": "M01",
+      "requested_slot": "18:00",
+      "suggested_slot": "19:00",
+      "pending_confirmation": true
+    },
+    "tool_result_summary": "{\"draft_id\": \"D-4de8533c3e0f\", \"draft_saved\": true, \"duplicate\": false, \"material_id\": \"M01\", \"requested_slot\": \"18:00\", \"suggested_slot\": \"19:00\", \"pending_confirmation\": true, \"status\": \"draft\"}",
+    "decision_basis": "已验证替代时段 19:00 空闲，保存草稿并标记待确认（改变了硬性时间要求，需用户同意）。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 6,
+    "action": "finish",
+    "action_input": {
+      "status": "draft_saved",
+      "review_status": "draft_saved",
+      "risk_reasons": [],
+      "suggested_slot": "19:00",
+      "pending_confirmation": true,
+      "draft_saved": true,
+      "draft_id": "D-4de8533c3e0f",
+      "duplicate": false,
+      "reason": "草稿已保存，待确认后方可发布"
+    },
+    "tool_result_summary": "",
+    "decision_basis": "草稿已保存，汇总审核状态、风险与待确认项后结束。",
+    "next": "done"
+  }
+]

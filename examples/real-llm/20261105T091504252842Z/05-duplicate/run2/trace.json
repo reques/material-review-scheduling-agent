@@ -1,0 +1,62 @@
+[
+  {
+    "step": 1,
+    "action": "get_material",
+    "action_input": {
+      "material_id": "M06"
+    },
+    "tool_result_summary": "{\"id\": \"M06\", \"title\": \"品牌故事短视频\", \"type\": \"video\", \"duration_seconds\": 40, \"format\": \"mp4\", \"copyright_license\": \"自有版权\", \"license\": \"自有版权\", \"owner\": \"内容组\", \"sensitive_flags\": [], \"disclaimer\": \"已包含免责声明\", \"missing_fields\": []}",
+    "decision_basis": "先读取素材 M06 的元数据，确认类型与基本信息。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 2,
+    "action": "check_rules",
+    "action_input": {
+      "material_id": "M06"
+    },
+    "tool_result_summary": "{\"material_id\": \"M06\", \"risks\": [], \"missing_fields\": []}",
+    "decision_basis": "素材元数据完整，下一步按规则检查风险。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 3,
+    "action": "query_schedule",
+    "action_input": {
+      "slot": "20:00"
+    },
+    "tool_result_summary": "{\"slot\": \"20:00\", \"occupied\": false, \"occupant_material_id\": null, \"nearby_free_slots\": [\"21:00\", \"22:00\", \"23:00\"]}",
+    "decision_basis": "素材已读取且规则检查无风险、无缺失字段；下一步需查询请求时段 20:00 是否被占用，再决定建议时段并保存草稿。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 4,
+    "action": "save_draft",
+    "action_input": {
+      "material_id": "M06",
+      "requested_slot": "20:00",
+      "suggested_slot": "20:00",
+      "pending_confirmation": false
+    },
+    "tool_result_summary": "{\"draft_id\": \"D-55682df65f2c\", \"draft_saved\": true, \"duplicate\": true, \"material_id\": \"M06\", \"requested_slot\": \"20:00\", \"suggested_slot\": \"20:00\", \"pending_confirmation\": false, \"status\": \"draft\"}",
+    "decision_basis": "素材元数据完整、规则检查无风险，20:00 时段空闲且为硬性要求时段，无需改期。保存草稿前先写入草稿记录。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 5,
+    "action": "finish",
+    "action_input": {
+      "status": "draft",
+      "review_status": "passed",
+      "risk_reasons": [],
+      "suggested_slot": "20:00",
+      "pending_confirmation": false,
+      "draft_saved": true,
+      "draft_id": "D-55682df65f2c",
+      "reason": "素材自有版权、含免责声明、无敏感标签，规则检查零风险；20:00 时段未被占用，按用户硬性要求原时段保存草稿，未真实发布。"
+    },
+    "tool_result_summary": "",
+    "decision_basis": "素材 M06 元数据完整、规则检查无风险，20:00 时段空闲；草稿已按用户原定 20:00 保存（幂等返回已有草稿 D-55682df65f2c），无需改期或待确认，仅保存草稿未发布。",
+    "next": "done"
+  }
+]

@@ -1,0 +1,17 @@
+{
+  "material_id": "M01",
+  "requested_slot": "18:00",
+  "suggested_slot": "19:00",
+  "status": "draft_saved",
+  "review_status": "passed",
+  "risk_reasons": [],
+  "pending_confirmation": true,
+  "draft_saved": true,
+  "draft_id": "D-4de8533c3e0f",
+  "duplicate": false,
+  "published": false,
+  "reason": "素材 M01 的元数据完整，规则检查没有风险，也没有缺失字段。原请求时段 18:00 已被 M00 占用，因此建议改用已确认空闲的 19:00。根据要求不改变硬性发布时间，替代时段仍标记为待确认；已仅保存草稿，未真实发布。",
+  "guard_corrections": [
+    "normalized model status: 使用保存工具观察统一为 draft_saved"
+  ]
+}

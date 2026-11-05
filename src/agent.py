@@ -2,7 +2,7 @@
 
 流程：渲染提示词（系统指令 + 工具 Schema + 任务 + 历史）-> llm.decide()
 -> 校验动作 -> 执行工具 -> 把观察结果写回历史 -> 下一步再调用模型。
-护栏（guards）只在 finish / 步数上限时于循环外强制执行，不替代模型决策。
+保存工具在写入前检查安全条件；结果护栏在 finish / 步数上限时核对观察。
 """
 
 from __future__ import annotations
@@ -52,6 +52,7 @@ def run(request: AgentRequest, llm, tools: Tools, max_steps: int = 8):
     history: list[dict] = []
     observations: list[dict] = []
     trace: list[dict] = []
+    tools.begin_request(request)
 
     for step in range(1, max_steps + 1):
         prompt = render_prompt(request, history)
@@ -64,7 +65,7 @@ def run(request: AgentRequest, llm, tools: Tools, max_steps: int = 8):
                           "tool_result_summary": _summarize(obs),
                           "decision_basis": "", "next": "retry within step cap"})
             continue
-        if not isinstance(decision, dict) or "action" not in decision:
+        if not isinstance(decision, dict) or not isinstance(decision.get("action"), str):
             obs = {"error": "invalid_decision", "detail": "模型决策缺少 action 字段"}
             history.append({"action": "invalid_decision", "action_input": {}, "observation": obs})
             trace.append({"step": step, "action": "invalid_decision", "action_input": {},
@@ -77,7 +78,8 @@ def run(request: AgentRequest, llm, tools: Tools, max_steps: int = 8):
         action_input = decision.get("action_input") or {}
 
         if action == "finish":
-            result = assemble_result(action_input, observations, request.requested_slot, request.material_id)
+            result = assemble_result(action_input if isinstance(action_input, dict) else {}, observations,
+                                     request.requested_slot, request.material_id)
             trace.append({"step": step, "action": "finish", "action_input": action_input,
                           "tool_result_summary": "",
                           "decision_basis": thought, "next": "done"})
@@ -91,20 +93,11 @@ def run(request: AgentRequest, llm, tools: Tools, max_steps: int = 8):
                       "tool_result_summary": _summarize(observation),
                       "decision_basis": thought, "next": "model decides next step from observation"})
 
-    # 步数上限：明确返回未完成状态，不声称草稿已保存。
-    result = {
-        "material_id": request.material_id,
-        "requested_slot": request.requested_slot,
-        "suggested_slot": None,
-        "status": "incomplete",
-        "review_status": "incomplete",
-        "risk_reasons": [],
-        "pending_confirmation": False,
-        "draft_saved": False,
-        "draft_id": None,
-        "duplicate": False,
-        "published": False,
-        "reason": f"达到步数上限（max_steps={max_steps}）仍未完成，未保存草稿",
-        "guard_corrections": [f"step cap reached at max_steps={max_steps}"],
-    }
+    # 未完成与副作用分别报告：最后一步可能已经保存草稿。
+    saved = next((obs for obs in reversed(observations) if obs.get("draft_saved")), None)
+    result = assemble_result({"status": "incomplete", "review_status": "incomplete",
+                              "reason": f"达到步数上限（max_steps={max_steps}）仍未完成；"
+                                        + ("草稿已保存" if saved else "未观察到草稿保存成功")},
+                             observations, request.requested_slot, request.material_id)
+    result["guard_corrections"].append(f"step cap reached at max_steps={max_steps}")
     return result, trace

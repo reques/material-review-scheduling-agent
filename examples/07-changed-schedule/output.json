@@ -1,0 +1,22 @@
+{
+  "material_id": "M01",
+  "requested_slot": "18:00",
+  "suggested_slot": null,
+  "status": "blocked",
+  "review_status": "blocked",
+  "risk_reasons": [
+    "已有草稿与当前建议时段不一致"
+  ],
+  "pending_confirmation": false,
+  "draft_saved": false,
+  "draft_id": null,
+  "duplicate": false,
+  "published": false,
+  "reason": "已有草稿的时段与当前建议不同，请先人工处理已有草稿。",
+  "guard_corrections": [],
+  "existing_draft": {
+    "draft_id": "D-4de8533c3e0f",
+    "suggested_slot": "19:00",
+    "pending_confirmation": true
+  }
+}

@@ -17,6 +17,7 @@ class Material:
     sensitive_flags: list = field(default_factory=list)
     disclaimer: str = ""
     supplement: dict = field(default_factory=dict)
+    work_status: str = "unspecified"
 
     def missing_fields(self) -> list:
         """返回缺失的关键字段名。空字符串视为缺失。"""

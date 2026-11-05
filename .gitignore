@@ -1,6 +1,10 @@
 __pycache__/
 *.pyc
+.venv/
+.idea/
 .env
+.env.*
+!.env.example
 .drafts.json
 output/
 drafts.json

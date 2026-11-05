@@ -1,0 +1,58 @@
+{
+  "pending": [
+    {
+      "material_id": "M01",
+      "title": "产品介绍短视频",
+      "work_status": "pending",
+      "processing_state": "not_started",
+      "missing_fields": [],
+      "drafts": []
+    },
+    {
+      "material_id": "M02",
+      "title": "",
+      "work_status": "pending",
+      "processing_state": "not_started",
+      "missing_fields": [
+        "title",
+        "license"
+      ],
+      "drafts": []
+    },
+    {
+      "material_id": "M03",
+      "title": "转载合集视频",
+      "work_status": "pending",
+      "processing_state": "not_started",
+      "missing_fields": [],
+      "drafts": []
+    },
+    {
+      "material_id": "M04",
+      "title": "新品预告短视频",
+      "work_status": "pending",
+      "processing_state": "not_started",
+      "missing_fields": [],
+      "drafts": []
+    },
+    {
+      "material_id": "M05",
+      "title": "活动回顾短视频",
+      "work_status": "pending",
+      "processing_state": "not_started",
+      "missing_fields": [
+        "disclaimer"
+      ],
+      "drafts": []
+    },
+    {
+      "material_id": "M06",
+      "title": "品牌故事短视频",
+      "work_status": "pending",
+      "processing_state": "not_started",
+      "missing_fields": [],
+      "drafts": []
+    }
+  ],
+  "unclassified": []
+}

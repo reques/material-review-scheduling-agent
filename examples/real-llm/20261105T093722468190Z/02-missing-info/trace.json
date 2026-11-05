@@ -1,0 +1,52 @@
+[
+  {
+    "step": 1,
+    "action": "get_material",
+    "action_input": {
+      "material_id": "M02"
+    },
+    "tool_result_summary": "{\"id\": \"M02\", \"title\": \"\", \"type\": \"video\", \"duration_seconds\": 30, \"format\": \"mp4\", \"copyright_license\": \"\", \"license\": \"\", \"owner\": \"内容组\", \"sensitive_flags\": [], \"disclaimer\": \"已包含免责声明\", \"missing_fields\": [\"title\", \"license\"]}",
+    "decision_basis": "先读取素材 M02 的元数据，确认审核所需字段是否齐全。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 2,
+    "action": "supplement_info",
+    "action_input": {
+      "material_id": "M02"
+    },
+    "tool_result_summary": "{\"material_id\": \"M02\", \"supplemented_fields\": {}, \"still_missing\": [\"title\", \"license\"], \"resolved\": false}",
+    "decision_basis": "素材 M02 缺少 title 和 license 字段，先补查缺失信息，再决定审核与排期。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 3,
+    "action": "check_rules",
+    "action_input": {
+      "material_id": "M02"
+    },
+    "tool_result_summary": "{\"material_id\": \"M02\", \"risks\": [{\"rule_id\": \"R01\", \"severity\": \"block\", \"reason\": \"缺少版权/授权信息\"}, {\"rule_id\": \"R06\", \"severity\": \"block\", \"reason\": \"缺少素材标题，信息不完整\"}], \"missing_fields\": [\"title\", \"license\"]}",
+    "decision_basis": "素材缺少 title 与 license，补查仍未解决；先执行规则检查以获取风险清单，再决定是否可保存草稿并标记待确认。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 4,
+    "action": "finish",
+    "action_input": {
+      "status": "blocked",
+      "review_status": "blocked",
+      "risk_reasons": [
+        "缺少版权/授权信息",
+        "缺少素材标题，信息不完整"
+      ],
+      "suggested_slot": null,
+      "pending_confirmation": false,
+      "draft_saved": false,
+      "draft_id": null,
+      "reason": "素材 M02 缺少 title 和 license，补查后仍未补齐；规则检查返回 R01、R06 两项 block 级风险，因此不进入 17:00 排期，也不保存草稿。"
+    },
+    "tool_result_summary": "",
+    "decision_basis": "素材存在两项阻断级风险：缺少版权/授权信息、缺少素材标题；补查后仍缺失，无法继续排期或保存草稿。",
+    "next": "done"
+  }
+]

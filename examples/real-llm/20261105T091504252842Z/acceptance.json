@@ -1,0 +1,11 @@
+{
+  "checks": {
+    "normal": true,
+    "risk": true,
+    "duplicate": true,
+    "save_failure": true,
+    "all_real_responses": true,
+    "no_publish": true
+  },
+  "all_passed": true
+}

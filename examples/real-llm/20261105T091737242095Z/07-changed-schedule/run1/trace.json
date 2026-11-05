@@ -1,0 +1,85 @@
+[
+  {
+    "step": 1,
+    "action": "get_material",
+    "action_input": {
+      "material_id": "M01"
+    },
+    "tool_result_summary": "{\"id\": \"M01\", \"title\": \"产品介绍短视频\", \"type\": \"video\", \"duration_seconds\": 45, \"format\": \"mp4\", \"copyright_license\": \"自有版权\", \"license\": \"自有版权\", \"owner\": \"内容组\", \"sensitive_flags\": [], \"disclaimer\": \"已包含免责声明\", \"missing_fields\": []}",
+    "decision_basis": "先读取素材 M01 的元数据，确认内容与硬性发布时间要求，再进行规则检查和排期。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 2,
+    "action": "check_rules",
+    "action_input": {
+      "material_id": "M01"
+    },
+    "tool_result_summary": "{\"material_id\": \"M01\", \"risks\": [], \"missing_fields\": []}",
+    "decision_basis": "素材元数据完整且无明显敏感项，下一步按规则库执行风险检查。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 3,
+    "action": "query_schedule",
+    "action_input": {
+      "slot": "18:00"
+    },
+    "tool_result_summary": "{\"slot\": \"18:00\", \"occupied\": true, \"occupant_material_id\": \"M00\", \"nearby_free_slots\": [\"19:00\", \"20:00\", \"21:00\"]}",
+    "decision_basis": "素材元数据完整，规则检查无风险；下一步确认 18:00 时段是否可用。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 4,
+    "action": "save_draft",
+    "action_input": {
+      "material_id": "M01",
+      "requested_slot": "18:00",
+      "suggested_slot": "19:00",
+      "pending_confirmation": true
+    },
+    "tool_result_summary": "{\"error\": \"guard_rejected\", \"detail\": \"建议时段未验证为空闲或已被占用\"}",
+    "decision_basis": "素材 M01 无版权/敏感风险，字段完整；但用户要求的 18:00 已被 M00 占用，需建议最近空闲时段 19:00，并标记待用户确认后保存草稿。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 5,
+    "action": "query_schedule",
+    "action_input": {
+      "slot": "19:00"
+    },
+    "tool_result_summary": "{\"slot\": \"19:00\", \"occupied\": false, \"occupant_material_id\": null, \"nearby_free_slots\": [\"20:00\", \"21:00\", \"22:00\"]}",
+    "decision_basis": "草稿保存被守卫拒绝，原因是建议时段 19:00 尚未经过单独查询验证；虽然它在附近空闲时段列表中出现过，但需要先对该时段单独调用 query_schedule 查询确认，再重新保存草稿。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 6,
+    "action": "save_draft",
+    "action_input": {
+      "material_id": "M01",
+      "requested_slot": "18:00",
+      "suggested_slot": "19:00",
+      "pending_confirmation": true
+    },
+    "tool_result_summary": "{\"draft_id\": \"D-4de8533c3e0f\", \"draft_saved\": true, \"duplicate\": false, \"material_id\": \"M01\", \"requested_slot\": \"18:00\", \"suggested_slot\": \"19:00\", \"pending_confirmation\": true, \"status\": \"draft\"}",
+    "decision_basis": "规则检查无风险，18:00 已被 M00 占用；19:00 已验证为空闲。按要求 18:00 是硬性要求，改为 19:00 属建议时段，须标记待确认，仅保存草稿。",
+    "next": "model decides next step from observation"
+  },
+  {
+    "step": 7,
+    "action": "finish",
+    "action_input": {
+      "status": "draft",
+      "review_status": "passed",
+      "risk_reasons": [],
+      "suggested_slot": "19:00",
+      "pending_confirmation": true,
+      "draft_saved": true,
+      "draft_id": "D-4de8533c3e0f",
+      "reason": "素材 M01 元数据完整、规则检查无风险。指定时段 18:00 已被 M00 占用，建议改为相邻空闲时段 19:00；该建议与硬性要求不同，已标记待确认。仅保存草稿，未真实发布。"
+    },
+    "tool_result_summary": "",
+    "decision_basis": "规则检查无风险，18:00 已被占用，19:00 已确认空闲，草稿已幂等保存且标记待用户确认；不得改变硬性 18:00 要求，也不声称已发布。",
+    "next": "done"
+  }
+]

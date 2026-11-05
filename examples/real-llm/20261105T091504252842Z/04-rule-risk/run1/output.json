@@ -1,0 +1,18 @@
+{
+  "material_id": "M03",
+  "requested_slot": "17:00",
+  "suggested_slot": null,
+  "status": "blocked",
+  "review_status": "blocked",
+  "risk_reasons": [
+    "素材为未授权转载，存在版权风险",
+    "素材带有敏感内容标记"
+  ],
+  "pending_confirmation": false,
+  "draft_saved": false,
+  "draft_id": null,
+  "duplicate": false,
+  "published": false,
+  "reason": "素材 M03 存在两项硬性阻断风险（未授权转载、敏感内容），不满足发布条件，故未保存草稿、未占用 17:00 时段。建议先补充版权授权与敏感内容复核，通过后再重新提交排期；原硬性时段要求 17:00 未被变更。",
+  "guard_corrections": []
+}

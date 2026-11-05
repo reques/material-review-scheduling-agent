@@ -1,0 +1,18 @@
+{
+  "material_id": "M02",
+  "requested_slot": "17:00",
+  "suggested_slot": null,
+  "status": "blocked",
+  "review_status": "blocked",
+  "risk_reasons": [
+    "缺少版权/授权信息",
+    "缺少素材标题，信息不完整"
+  ],
+  "pending_confirmation": false,
+  "draft_saved": false,
+  "draft_id": null,
+  "duplicate": false,
+  "published": false,
+  "reason": "素材 M02 未通过规则检查，存在 block 级风险且补查未能补齐缺失字段，无法保存草稿或安排发布；请内容组补充标题与版权/授权信息后重新提交审核。请求时段 17:00 未做任何变更或占用。",
+  "guard_corrections": []
+}

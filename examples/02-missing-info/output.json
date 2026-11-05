@@ -13,6 +13,6 @@
   "draft_id": null,
   "duplicate": false,
   "published": false,
-  "reason": "阻塞级规则风险：缺少版权/授权信息; 缺少素材标题，信息不完整",
+  "reason": "素材存在阻塞级规则风险，请处理后重新提交。",
   "guard_corrections": []
 }

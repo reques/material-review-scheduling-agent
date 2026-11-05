@@ -1,0 +1,18 @@
+{
+  "mode": "real",
+  "started_by": "scripts/run_real_remaining.py",
+  "recorded_at_utc": "2026-11-05T09:15:30.403632+00:00",
+  "api_host": "api.deepseek.com",
+  "model_requested": "deepseek-flash",
+  "models_reported_by_api": [
+    "deepseek-flash",
+    "deepseek-flash",
+    "deepseek-flash",
+    "deepseek-flash",
+    "deepseek-flash"
+  ],
+  "model_call_attempts": 5,
+  "valid_model_responses": 5,
+  "max_steps": 10,
+  "simulate_save_failure": false
+}
