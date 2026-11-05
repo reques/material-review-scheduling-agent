@@ -116,7 +116,7 @@ get_material(M02)           缺失 title / license
 - 重新生成 `examples/`，确认输出可复现。
 - 扫了一遍仓库里的文本，没有 `sk-` 开头的密钥、`Bearer` 令牌、邮箱或本机绝对路径；`.env` 只在本地，`.gitignore` 已覆盖。
 - `data/` 里全部是虚构素材和规则，`M00` 只是 18:00 的占用来历，没有真实内容。
-- 当前工作副本没有 `.git`，所以我还不能给出最终 commit SHA；这一条在 `docs/06-submission-checklist.md` 里单独列了。
+- GitHub 仓库已推送；最终 commit SHA 见提交表（本文件不记录自身 SHA，避免自引用）。
 
 ## 失败和限制
 

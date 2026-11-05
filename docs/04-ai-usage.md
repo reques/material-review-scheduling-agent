@@ -131,6 +131,6 @@ AI 也犯过错，而且不是小错：
 - 草稿存储是单 JSON 文件，没有并发锁，不适合多人同时提交；
 - 排期只支持整点，没有分钟级和跨日；
 - 我没有逐行审查所有代码，也没有独立重跑所有真实模型记录；我重点看了输出、Trace、草稿副作用和失败场景；
-- 当前工作副本没有 `.git`，最终 GitHub URL 和 commit SHA 还没填，见 `docs/06-submission-checklist.md`。
+- GitHub 仓库已推送；提交表里的最终 commit SHA 还需要在仓库最新 commit 上取，见 `docs/06-submission-checklist.md`。
 
 这些空白不影响本次六类验收，但我不打算把它们写成"已完成"。

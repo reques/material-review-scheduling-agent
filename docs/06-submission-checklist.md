@@ -4,9 +4,11 @@
 
 ## 结论先说
 
-**仓库内容基本达到提交标准；GitHub 提交动作还没完成。**
+**仓库内容已达到提交标准，代码和文档已推送到 GitHub。**
 
-具体说：代码、测试、数据、示例、六类验收记录、真实模型记录、docs/01–05、依赖文件和 `.env.example` 都在，31 项离线测试通过，示例可重新生成。缺的是题目要求的 **GitHub 仓库 URL** 和 **最终 commit SHA**——当前工作副本没有 `.git`，所以现在给不出 SHA。这一条必须在上传后补。
+仓库地址：<https://github.com/reques/material-review-scheduling-agent>
+
+具体说：代码、测试、数据、示例、六类验收记录、真实模型记录、docs/01–05、依赖文件和 `.env.example` 都在，31 项离线测试通过，示例可重新生成。题号是 1，URL 已填；**最终 commit SHA** 以提交表单为准（本文档不写自身 SHA，避免自引用）。
 
 ## 逐项对照
 
@@ -29,21 +31,20 @@
 | 至少两条执行路径，体现模型按工具结果调整 | `04-slot-conflict`（6 步）和 `02-missing-info`（4 步）；真实模型另有记录 | 有 |
 | 步数/工具调用上限，超限明确未完成 | `--max-steps` 默认 8；`test_step_cap` 验证 `incomplete` | 有 |
 | 不提交真实密钥或隐私数据 | 扫过 `sk-`、`Bearer`、邮箱、本机路径；`.env` 在 `.gitignore` 中 | 有，但见下面提醒 |
-| 题号、GitHub URL、最终 commit SHA | 题号是 1；URL 和 SHA 还没填 | **缺** |
+| 题号、GitHub URL、最终 commit SHA | 题号是 1；URL 已填；SHA 在提交表里填写 | URL 有，SHA 待填 |
 | 私有仓库给评审账号读权限 | 取决于最终仓库设置 | **待确认** |
 
-## 必须补的两项
+## 还需要补的一项
 
-1. **GitHub 仓库 URL**：提交时填题目要求的地址。如果仓库是私有的，把指定评审账号加成可读。
-2. **最终 commit SHA**：在最终提交的 commit 上执行：
+**最终 commit SHA**：仓库已经推送到 `main`。在仓库最新 commit 上执行：
 
-   ```bash
-   git rev-parse HEAD
-   ```
+```bash
+git rev-parse HEAD
+```
 
-   把完整 40 位 SHA 填到提交表里。不要在提交后又改文件却不重新提交，否则 SHA 会对不上。
+或者在 GitHub 的 commit 页面复制完整 40 位 SHA，填到提交表里。不要在提交后又改文件却不重新提交，否则 SHA 会对不上。
 
-当前目录没有 `.git`。如果已有 GitHub 仓库，建议把本目录内容同步到那个仓库，保留已有历史；不要在这里 `git init` 后强推覆盖原仓库。同步后按下面的清单再检查一遍。
+本机这个源目录没有 `.git`，但 GitHub 仓库已经是最终内容。要查看历史或取 SHA，可以重新 clone 一份；不要在这个源目录里 `git init` 后强推覆盖已有历史。
 
 ## 提交前不要带上的东西
 
@@ -59,6 +60,8 @@
 `.env.example` 要保留，里面不能有真实密钥。
 
 ## 提交前建议跑一遍
+
+在克隆目录执行：
 
 ```bash
 python3 -m unittest discover -s tests -v
@@ -80,7 +83,7 @@ git diff --cached --name-only
 - `docs/03-evaluation.md` 里的示例路径都存在；
 - `examples/real-llm/` 的 `metadata.json` 不含密钥，只有 `api_host`、模型名和调用次数；
 - 提交表里填的是：**题号 1、GitHub URL、最终 commit SHA**；
-- 如果仓库是私有的，评审账号已经能打开。
+- 仓库当前是公开的，评审可以直接打开；如果之后改成私有，记得给指定评审账号读权限。
 
 ## 提交表（填好后随邮件/表单提交）
 
