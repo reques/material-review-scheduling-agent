@@ -1,0 +1,53 @@
+# 离线测试结果（examples/ 内的实际运行记录）
+# 运行日期：2026-11-05
+# 运行环境：Python 3.13.5 / Windows
+# 运行命令：python -m unittest discover -s tests -v
+# 说明：以下为本次运行的真实终端输出；unittest 将进度写到 stderr，此处合并保存。
+# 退出码：0
+
+test_agent_normal (test_agent.TestAgentPaths.test_agent_normal)
+正常排期：M04 请求空闲时段 17:00，保存草稿，不待确认，不声称已发布。 ... ok
+test_duplicate (test_agent.TestAgentPaths.test_duplicate)
+重复提交：同一请求两次，只产生一份草稿，同一 draft_id，第二次 duplicate=true。 ... ok
+test_missing_info (test_agent.TestAgentPaths.test_missing_info)
+信息缺失：M02 补查后仍缺失（标题+授权），阻塞，不保存草稿。 ... ok
+test_missing_info_supplement_resolves (test_agent.TestAgentPaths.test_missing_info_supplement_resolves)
+补查分支：M05 缺失免责声明，补查返回声明后继续并保存草稿。 ... ok
+test_rule_risk (test_agent.TestAgentPaths.test_rule_risk)
+规则风险：M03 未授权+敏感标记，阻塞，不保存草稿，不查询排期后保存。 ... ok
+test_save_failure (test_agent.TestAgentPaths.test_save_failure)
+保存失败：失败存储下明确返回 save_failed，无 draft_id，不声称已保存。 ... ok
+test_slot_conflict (test_agent.TestAgentPaths.test_slot_conflict)
+时段冲突：M01 请求 18:00（被占），建议观察到的 19:00，待确认，仅草稿。 ... ok
+test_step_cap (test_agent.TestAgentPaths.test_step_cap)
+步数上限：永不 finish 的桩 LLM -> incomplete，明确原因，不声称草稿。 ... ok
+test_guards_blocked_risk_no_draft (test_agent.TestGuards.test_guards_blocked_risk_no_draft) ... ok
+test_guards_hard_requirement_flag (test_agent.TestGuards.test_guards_hard_requirement_flag) ... ok
+test_guards_publish_claim (test_agent.TestGuards.test_guards_publish_claim)
+护栏：模型声称 published 时必须被降级/拒绝，永不透传。 ... ok
+test_conflicting_existing_draft_is_reported_without_overwrite (test_agent.TestSafetyAndState.test_conflicting_existing_draft_is_reported_without_overwrite) ... ok
+test_different_materials_do_not_share_a_draft_slot (test_agent.TestSafetyAndState.test_different_materials_do_not_share_a_draft_slot) ... ok
+test_no_save_observation_cannot_claim_saved_in_blocked_result (test_agent.TestSafetyAndState.test_no_save_observation_cannot_claim_saved_in_blocked_result) ... ok
+test_publish_claim_in_reason_is_removed (test_agent.TestSafetyAndState.test_publish_claim_in_reason_is_removed) ... ok
+test_real_write_exception_returns_save_failed (test_agent.TestSafetyAndState.test_real_write_exception_returns_save_failed) ... ok
+test_save_rechecks_slot_after_observation (test_agent.TestSafetyAndState.test_save_rechecks_slot_after_observation) ... ok
+test_step_cap_preserves_real_save_result (test_agent.TestSafetyAndState.test_step_cap_preserves_real_save_result) ... ok
+test_write_guard_blocks_risky_and_unconfirmed_saves (test_agent.TestSafetyAndState.test_write_guard_blocks_risky_and_unconfirmed_saves) ... ok
+test_write_guard_requires_matching_request_and_observed_free_slot (test_agent.TestSafetyAndState.test_write_guard_requires_matching_request_and_observed_free_slot) ... ok
+test_llm_json_extraction (test_agent.TestToolValidation.test_llm_json_extraction) ... ok
+test_tool_validation (test_agent.TestToolValidation.test_tool_validation)
+未知工具/错误参数返回 error 观察，不抛异常；Agent 循环可继续。 ... ok
+test_missing_material_reports_observed_reason (test_pending_and_output.TestControlledOutput.test_missing_material_reports_observed_reason) ... ok
+test_model_claims_and_unknown_status_never_appear_in_final_text (test_pending_and_output.TestControlledOutput.test_model_claims_and_unknown_status_never_appear_in_final_text) ... ok
+test_saved_result_uses_observed_risk_and_draft_not_model_text (test_pending_and_output.TestControlledOutput.test_saved_result_uses_observed_risk_and_draft_not_model_text) ... ok
+test_explicit_pending_and_unclassified_drafts_and_conflicts (test_pending_and_output.TestPendingEntry.test_explicit_pending_and_unclassified_drafts_and_conflicts) ... ok
+test_list_cli_needs_no_model_and_returns_json (test_pending_and_output.TestPendingEntry.test_list_cli_needs_no_model_and_returns_json) ... ok
+test_list_cli_reports_corrupt_store (test_pending_and_output.TestPendingEntry.test_list_cli_reports_corrupt_store) ... ok
+test_chat_completion_request_and_response (test_real_client.TestRealClientContract.test_chat_completion_request_and_response) ... ok
+test_invalid_model_output_is_not_counted_as_valid (test_real_client.TestRealClientContract.test_invalid_model_output_is_not_counted_as_valid) ... ok
+test_realistic_draft_status_is_normalized_with_observed_save (test_real_client.TestRealClientContract.test_realistic_draft_status_is_normalized_with_observed_save) ... ok
+
+----------------------------------------------------------------------
+Ran 31 tests in 0.087s
+
+OK
